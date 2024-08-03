@@ -3,4 +3,6 @@
 **/__pycache__
 
 logs/
-scripts/
+apscheduler_webui.egg-info/*
+build/lib/*
+.env
