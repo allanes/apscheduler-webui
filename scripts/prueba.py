@@ -1,13 +1,15 @@
 import os
 from src.log import server_log
 import requests
-# from scripts.utils_logging import logger
+import httpx
+import asyncio
+from scripts.utils_sio import connect_to_sio
 
 def funcion_prueba():
     print('Ejecutando funcion de prubea')
     server_log.info('Ejecutando funcion de prubea')
 
-def iniciar_sincronizacion_catalogo():
+def iniciar_sincronizacion_catalogo() -> bool:
     server_log.info('Ejecutando sincronizacion de catalogo vtex...')
     domain = 'localhost'
     port = '9000'
@@ -33,11 +35,23 @@ def iniciar_sincronizacion_catalogo():
     if response.status_code == 200:
         # print("Successfully triggered catalogo_vtex sync")
         server_log.info("Successfully triggered catalogo_vtex sync")
-        # last_sync_status = {"timestamp": datetime.now(), "status": "Success"}
+        return True
     else:
         # print(f"Failed to trigger catalogo_vtex sync. Status code: {response.status_code}")
         server_log.error(f"Failed to trigger catalogo_vtex sync. Status code: {response.status_code}")
-        # last_sync_status = {"timestamp": datetime.now(), "status": f"Failed - Status code: {response.status_code}"}
+        return False
+
+async def recibir_mensajes_progreso():
+    sincronizacion_iniciada = iniciar_sincronizacion_catalogo()
+    if sincronizacion_iniciada:
+        server_log.info("Iniciando conexion con SocketIO")
+        await connect_to_sio()  # Connect to socket.io after triggering the sync
+    else:
+        server_log.error(f"Failed to trigger catalogo_vtex sync. Status code: {sincronizacion_iniciada.status_code}")
+
+async def main():
+    await recibir_mensajes_progreso()
 
 if __name__ == '__main__':
     iniciar_sincronizacion_catalogo()
+    asyncio.run(main())
