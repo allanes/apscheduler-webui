@@ -3,7 +3,7 @@ from src.log import server_log
 import requests
 import httpx
 import asyncio
-from scripts.utils_sio import connect_to_sio
+from scripts.utils_sio import run_socketio#, connect_to_sio
 
 def funcion_prueba():
     print('Ejecutando funcion de prubea')
@@ -16,42 +16,25 @@ def iniciar_sincronizacion_catalogo() -> bool:
     base_url = f'http://{domain}:{port}/api'
     url = f'{base_url}/salidas/start-fetch-products'
     token = os.getenv("API_TOKEN")
-    if not token:
-        # logger.error("API_TOKEN is not set in environment variables")
-        # last_sync_status = {"timestamp": datetime.now(), "status": "Failed - API_TOKEN not set"}
-        return
-
     headers = {'Authorization': f'Bearer {token}'}
-    params = {
-        'verificar_links': False,
-        'completo': False
-    }
-    server_log.info(f'    Ejecutando consulta...')
-    response = requests.get(
-        url=url,
-        params=params,
-        headers=headers
-    )
+    params = {'verificar_links': False, 'completo': False}
+    
+    response = requests.get(url, params=params, headers=headers)
     if response.status_code == 200:
-        # print("Successfully triggered catalogo_vtex sync")
         server_log.info("Successfully triggered catalogo_vtex sync")
         return True
     else:
-        # print(f"Failed to trigger catalogo_vtex sync. Status code: {response.status_code}")
         server_log.error(f"Failed to trigger catalogo_vtex sync. Status code: {response.status_code}")
         return False
 
-async def recibir_mensajes_progreso():
-    sincronizacion_iniciada = iniciar_sincronizacion_catalogo()
-    if sincronizacion_iniciada:
+def recibir_mensajes_progreso():
+    if iniciar_sincronizacion_catalogo():
         server_log.info("Iniciando conexion con SocketIO")
-        await connect_to_sio()  # Connect to socket.io after triggering the sync
+        # connect_to_sio()
+        run_socketio()
     else:
-        server_log.error(f"Failed to trigger catalogo_vtex sync. Status code: {sincronizacion_iniciada.status_code}")
-
-async def main():
-    await recibir_mensajes_progreso()
+        server_log.error("Failed to trigger catalogo_vtex sync due to incorrect status code or missing token")
 
 if __name__ == '__main__':
     iniciar_sincronizacion_catalogo()
-    asyncio.run(main())
+    recibir_mensajes_progreso()

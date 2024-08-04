@@ -7,3 +7,6 @@ apscheduler_webui.egg-info/*
 build/lib/*
 .env
 postgres_data
+scripts/funciones.py
+scripts/monitor_catalogo_vtex.py
+scripts/utils_logging.py
