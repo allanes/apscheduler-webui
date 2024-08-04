@@ -6,3 +6,4 @@ logs/
 apscheduler_webui.egg-info/*
 build/lib/*
 .env
+postgres_data

@@ -1,0 +1,12 @@
+pymongo
+redis
+sqlalchemy
+psycopg2-binary
+psycopg2
+python-socketio[client]
+aiohttp
+httpx
+apscheduler
+python-dotenv
+flask
+requests
