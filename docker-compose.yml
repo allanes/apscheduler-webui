@@ -1,6 +1,6 @@
 services:
   postgres:
-    container_name: catalogo-vtex-scheduler-db
+    container_name: ${POSTGRES_CONTAINER_NAME}
     image: postgres:latest
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
@@ -14,7 +14,7 @@ services:
       - scheduler-app_network
 
   pgadmin:
-    container_name: catalogo-vtex-scheduler-pg-admin
+    container_name: ${PGADMIN_CONTAINER_NAME}
     image: dpage/pgadmin4:latest
     environment:
       - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL}
@@ -28,6 +28,7 @@ services:
       - scheduler-app_network
 
   scheduler:
+    container_name: ${SCHEDULER_CONTAINER_NAME}
     build: .
     volumes:
       - ./logs:/app/logs
@@ -37,8 +38,10 @@ services:
     ports:
       - "5500:5500"
     command: /bin/sh -c "sleep 30 && uvicorn main:app --port 5500 --host 0.0.0.0"
-    environment:
-      - API_TOKEN=${API_TOKEN}
+    # environment:
+    #   - API_TOKEN=${API_TOKEN}
+    env_file:
+      - .env
     depends_on:
       - postgres
         # condition: service_healthy

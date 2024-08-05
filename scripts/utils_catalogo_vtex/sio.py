@@ -1,3 +1,4 @@
+import os
 import asyncio
 from src.log import catalogo_vtex_log, server_log
 import socketio
@@ -30,7 +31,12 @@ def is_expected_format(data):
 
 async def connect_to_sio():
     try:
-        await sio.connect('http://catalogovtex_socketio:4000')
+        domain = os.getenv('CATALOGO_VTEX_SIO_DOMAIN')
+        port = os.getenv('CATALOGO_VTEX_SIO_PORT')  
+        sio_url = f'http://{domain}:{port}'
+        # sio_url = f'http://{domain}:{port}/socket.io'
+        server_log.debug(f'URL de conexion SIO: {sio_url}')
+        await sio.connect(sio_url)
         await sio.wait()
     # except Exception:
     #     catalogo_vtex_log.error(f'Error en la conexión con SocketIo')
