@@ -1,6 +1,6 @@
 services:
   postgres:
-    container_name: validaciones-scheduler-db
+    container_name: catalogo-vtex-scheduler-db
     image: postgres:latest
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
@@ -14,12 +14,12 @@ services:
       - scheduler-app_network
 
   pgadmin:
-    container_name: validaciones-scheduler-pg-admin
+    container_name: catalogo-vtex-scheduler-pg-admin
     image: dpage/pgadmin4:latest
     environment:
       - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL}
       - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}
-      - PGADMIN_LISTEN_PORT=${PGADMIN_LISTEN_PORT_INTERNAL}    
+      - PGADMIN_LISTEN_PORT=${PGADMIN_LISTEN_PORT_INTERNAL}
     ports:
       - "${PGADMIN_LISTEN_PORT_EXTERNAL}:${PGADMIN_LISTEN_PORT_INTERNAL}"
     depends_on:
@@ -27,6 +27,24 @@ services:
     networks:
       - scheduler-app_network
 
+  scheduler:
+    build: .
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - monitor_catalogo_net_catalogo_vtex
+      - scheduler-app_network
+    ports:
+      - "5500:5500"
+    command: /bin/sh -c "sleep 30 && uvicorn main:app --port 5500 --host 0.0.0.0"
+    environment:
+      - API_TOKEN=${API_TOKEN}
+    depends_on:
+      - postgres
+        # condition: service_healthy
+
 networks:
-  scheduler-app_network: 
+  scheduler-app_network:
     driver: bridge
+  monitor_catalogo_net_catalogo_vtex:
+    external: true

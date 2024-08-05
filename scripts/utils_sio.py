@@ -1,5 +1,5 @@
 import asyncio
-from src.log import server_log
+from src.log import catalogo_vtex_log, server_log
 import socketio
 
 # Timeout for the socket.io connection (in seconds)
@@ -10,19 +10,19 @@ sio = socketio.AsyncClient()
 
 @sio.event
 async def connect(*args, **kwargs):
-    server_log.info("Connected to Socket.IO server")
+    catalogo_vtex_log.info("Connected to Socket.IO server")
     # Start a timer to disconnect after TIMEOUT
     asyncio.get_event_loop().call_later(TIMEOUT, lambda: asyncio.create_task(sio.disconnect()))
 
 @sio.event
 async def disconnect():
-    server_log.info("Disconnected from Socket.IO server")
+    catalogo_vtex_log.info("Disconnected from Socket.IO server")
 
 @sio.on('*')
 async def catch_all(event, data):
-    server_log.info(f"Received event '{event}': {data}")
+    catalogo_vtex_log.info(f"Received event '{event}': {data}")
     if event == 'fin_busqueda':
-        server_log.info(f"Final event received with data: {data}")
+        catalogo_vtex_log.info(f"Final event received with data: {data}")
         await sio.disconnect()
 
 def is_expected_format(data):
@@ -30,8 +30,10 @@ def is_expected_format(data):
 
 async def connect_to_sio():
     try:
-        await sio.connect('http://localhost:9000/socket.io')
+        await sio.connect('http://catalogovtex_socketio:4000')
         await sio.wait()
+    # except Exception:
+    #     catalogo_vtex_log.error(f'Error en la conexión con SocketIo')
     finally:
         await sio.disconnect()
 

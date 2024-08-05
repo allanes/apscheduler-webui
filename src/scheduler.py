@@ -22,7 +22,7 @@ from apscheduler.job import Job
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from .config import SCHEDULER_CONFIG
-from .log import server_log
+from .log import catalogo_vtex_log
 
 scheduler = AsyncIOScheduler(**SCHEDULER_CONFIG)
 
@@ -33,14 +33,14 @@ def listen_executor_or_jobstore_event(
     action: Literal["Add executor", "Remove executor", "Add job store", "Remove job store"],
 ):
     obj = f"{event.alias}[{mapper[event.alias]}]" if event.alias in mapper else event.alias
-    server_log.debug(f"{action} {obj}")
+    catalogo_vtex_log.debug(f"{action} {obj}")
 
 
 def listen_job_event(
     event: JobEvent, action: Literal["Add job", "Remove job", "Modify job", "Submit job"]
 ):
     job: Job | None = scheduler.get_job(event.job_id)
-    server_log.debug(f"{action}: {job.name if job else ''}[{event.job_id}]")
+    catalogo_vtex_log.debug(f"{action}: {job.name if job else ''}[{event.job_id}]")
 
 
 def listen_job_execution_event(
@@ -49,16 +49,16 @@ def listen_job_execution_event(
 ):
     message = f"{action}: {event.job_id}[{scheduler.get_job(event.job_id)}]"
     if event.exception:
-        server_log.opt(exception=event.exception).error(message)
+        catalogo_vtex_log.opt(exception=event.exception).error(message)
     else:
-        server_log.debug(message)
+        catalogo_vtex_log.debug(message)
 
 
 def listen_job_submission_event(event: JobSubmissionEvent):
     job: Job | None = scheduler.get_job(event.job_id)
     if not job:
         return
-    server_log.debug(f"Submit job: {job.name}[{event.job_id}], next run at {job.next_run_time}")
+    catalogo_vtex_log.debug(f"Submit job: {job.name}[{event.job_id}], next run at {job.next_run_time}")
 
 
 listener = {

@@ -10,3 +10,7 @@ apscheduler
 python-dotenv
 flask
 requests
+loguru
+python-multipart
+fastui
+fastapi[standard]

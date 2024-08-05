@@ -54,6 +54,7 @@ logger.add(
 )
 
 server_log = logger.bind(server=True)
+catalogo_vtex_log = server_log
 
 
 # Intercept standard logging messages to use Loguru

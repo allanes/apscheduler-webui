@@ -2,64 +2,64 @@
 
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![Python Version](https://img.shields.io/badge/Python-3.10%2B-green.svg)](https://www.python.org/downloads/release/python-380/) [![FastUI Version](https://img.shields.io/badge/FastUI-orange.svg)](https://fastui.fastapi.tiangolo.com/) [![Apscheduler](https://img.shields.io/badge/APScheduler-3.x-blue.svg)](https://github.com/agronholm/apscheduler)
 
-中文 | [English](README_en.md)
+[中文](README.md) | English
 
-**apscheduler-webui** 是一个基于 [APScheduler](https://github.com/agronholm/apscheduler) 和 [FastUI](https://fastui.fastapi.tiangolo.com/) 构建的轻量级任务调度Web服务，旨在提供简洁直观的界面以管理和监控定时任务，同时利用 `APScheduler` 的强大功能实现灵活、高效的后台任务执行。
+**apscheduler-webui** is a lightweight task scheduling web service built upon [APScheduler](https://github.com/agronholm/apscheduler) and [FastUI](https://fastui.fastapi.tiangolo.com/), designed to provide a concise and intuitive interface for managing and monitoring scheduled tasks, while leveraging the powerful capabilities of `APScheduler` to execute background tasks in a flexible and efficient manner.
 
 ![screenshot](./pictures/screenshot.png)
 
-## 目录
+## Table of Contents
 
 - [apscheduler-webui](#apscheduler-webui)
-  - [目录](#目录)
-  - [主要特性](#主要特性)
-  - [快速开始](#快速开始)
-    - [任务管理](#任务管理)
-    - [Executor、JobStore管理](#executorjobstore管理)
-    - [日志查看](#日志查看)
-  - [许可证](#许可证)
+  - [Table of Contents](#table-of-contents)
+  - [Features](#features)
+  - [Quick Start](#quick-start)
+    - [Mange jobs](#mange-jobs)
+    - [Manger Executor and JobStore](#manger-executor-and-jobstore)
+    - [View logs](#view-logs)
+  - [License](#license)
 
-## 主要特性
+## Features
 
-- 创建、编辑、暂停、启动、删除、重载任务
-- 支持Cron、Interval、Date触发器
-- 创建、删除Executor和JobStore
-- 任务执行日志
-- 查看脚本文件内容
+- Create, modify, pause, resume, remove and reload jobs
+- Support for Cron, Interval, and Date triggers
+- Create and delete Executors and JobStores
+- Support for view your logs
+- View the content of script files
 
-## 快速开始
+## Quick Start
 
-1. 克隆本仓库
+1. Clone the repository
 
     ```bash
     git clone https://github.com/Dragon-GCS/apscheduler-webui
     ```
 
-2. 安装依赖
+2. Install dependencies
 
-    推荐使用[start](https://github.com/Dragon-GCS/start)
+    Use [start](https://github.com/Dragon-GCS/start)(Recommended)
 
     ```bash
-    start init  # 创建虚拟环境（可选）
+    start init  # Create virtual environment(Optional)
     start install
     ```
 
-    或者使用`pip`
+    Or use `pip`
 
     ```bash
-    python -m venv .venv # 创建虚拟环境（可选）
+    python -m venv .venv # Create virtual environment(Optional)
     pip install .
     ```
 
-3. 启动服务
+3. Start the server
 
     ```bash
-    uvicron main:app
+    uvicron main:app --port <port>
     ```
 
-### 任务管理
+### Mange jobs
 
-- 在你的脚本中使用apscheduler注册任务
+- Register jobs on your scripts
 
 ```python
 from src.scheduler import scheduler
@@ -71,20 +71,29 @@ def your_func(...):
     ...
 ```
 
-- 使用webui（`/new`），通过字符串注册任务：`your_module:your_func`
-  > 为了管理脚本，建议将脚本放在指定目录下（比如`scripts`）下并通过`scripts.your_module:your_func`注册任务
+- Use webui（`/new`），add new job with string: `your_module:your_func`
+  > For manage jobs, you can put your jobs under some folder(e.g. `scripts`), and use `scripts.your_module:your_func` to add jobs.
 
-### Executor、JobStore管理
+### Manger Executor and JobStore
 
-- 在`src/config.py`中配置
-- 通过webui(`/store`, `/executor`)管理（每次启动服务都会重置）
+- Config in`src/config.py`
 
-### 日志查看
+  ```python
+  SCHEDULER_CONFIG = {
+    "executors": {"default": AsyncIOExecutor()},
+    "jobstores": {},
+  }
+  ```
 
-- webui(`/log/jobs`)可以查看日志目录(默认为`logs`，可以在`config.py`中配置)中所有`jobs`开头的日志
-- 你可以直接使用`loguru.logger`来记录日志，但是日志格式需要使用`src.log.LOG_FORMAT`
-- 使用`src.log:server_log`，无需配置即可正确解析。
+- Use webui(`/store`, `/executor`)
+  > Not recommended because it will be reset when you restart the server
 
-## 许可证
+### View logs
 
-本项目采用 MIT 许可证。
+- You can use `loguru.logger` to record logs, but must set format with `src.log.LOG_FORMAT`。
+- Use `src.log.server_log` without any config, log will save to `logs` folder with format can be parsed correctly.
+- Webui(`/log/jobs`) can check your logs which is start with `jobs` and saved in specified folder (default is `logs`, can be changed in `config.py`)
+
+## License
+
+This project is licensed under the MIT License.

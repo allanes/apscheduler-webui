@@ -9,6 +9,6 @@ LOG_PATH = ROOT / "logs"
 SCHEDULER_CONFIG = {
     "executors": {"default": AsyncIOExecutor()},
     "jobstores": {"postgres": SQLAlchemyJobStore(
-        url='postgresql://adrian:1223@localhost:5432/scheduler-db'
+        url='postgresql://adrian:1223@catalogo-vtex-scheduler-db:5432/scheduler-db-2'
     )},
 }
